@@ -1,0 +1,49 @@
+
+# Sample table
+
+input_fofn: ""
+
+# Sample name cohort prefix
+## Note!: Leave empty if cohort prefix is included in input_fofn table file for samplename_cohortvcf.
+
+cohort_prefix: ""
+
+# Cohort multi sample VCF file
+
+cohort_vcf: ""
+cohort_vcf_index: ""
+
+# Exomiser 
+
+exomiser_path: "/exomiser/exomiser-cli-13.0.0/exomiser-cli-13.0.0.jar"
+exomiser_config: "/exomiser/exomiser-cli-13.0.0/application.properties"
+
+exomiser_yaml_template: "../single-sample-variant-priorization/templates/exomiser_13.0.0_hg38_template.yaml"
+exomiser_output_prefix: "Exomiser-13.0.0"
+
+# LIRICAL
+
+lirical_path: "/LIRICAL/v1.3.4/LIRICAL.jar"
+lirical_yaml_template: "../single-sample-variant-priorization/templates/lirical_1.3.4_template.yaml" 
+lirical_output_prefix: "LIRICAL-1.3.4"
+
+# Other 
+
+vt_path: "vt"
+vt_genome: "/reference_annotations/vt/Homo_sapiens_assembly38.fasta"
+
+bgzip_path: "bgzip"
+tabix_path: "tabix"
+
+gatk_path: "gatk"
+
+## Conda enviroment .yaml or existing local directory to conda enviroment
+conda_path: "/miniconda3/envs/variant-tools/"
+
+# Main output dir
+
+outdir: ""
+
+# Reference files
+
+fasta: "/GATK-bundle/hg38/v0/v0/Homo_sapiens_assembly38.fasta"

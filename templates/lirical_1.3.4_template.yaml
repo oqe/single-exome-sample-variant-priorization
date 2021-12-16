@@ -1,0 +1,18 @@
+## LIRICAL Analysis Template.
+# These are all the possible options for running LIRICAL. Use this as a template for
+# your own set-up.
+---
+analysis:
+# hg19 or hg38 is supported
+    genomeAssembly: hg38
+    vcf: 
+# fill in full exomiser data directory
+    exomiser: /exomiser/data/2109/2109_hg38
+# fill in full lirical data directory
+    datadir: /reference_annotations/LIRICAL/v1.3.4/data
+#    background: /path/to/custom_location2/background-hg38.txt
+    transcriptdb: refseq
+    orphanet: true
+hpoIds: 
+negatedHpoIds:
+prefix:
