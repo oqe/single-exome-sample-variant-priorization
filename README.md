@@ -3,13 +3,12 @@
 This is a nextflow workflow for extracting (human) single sample from a larger exome sequencing multisample/cohort VCF and annote and prioritize exome variants of that sample.
 
 **Here is a short description of the workflow stages:**  
-0. Generate sample and date specifc output directories
-1. Single sample vcf file is extracted from the cohort vcf with GATK SelectVariants (-sn) tool.
-2. Extracted vcf is decomposed and normalized by vt tool.
-3. Decomposed and normalized vcf is compressed (.gz) using bgzip and indexed (.tbi) using tabix.
-4. Generate sample specific .yaml files for Exomiser from input table information. Annotation and priorization for the variants of the vcf with sample specific HPO terms is done with Exomiser 
-5. Generate sample specific .yaml files for LIRICAL from input table information and "Phenotype-driven priorization of candidate diseases and genes..." is done with LIRICAL (: LIkelihood Ratio Interpretation of Clinical AbnormaLities).  
-[ ] 7. VEP annotation ???
+1. Generate sample and date specifc output directories
+2. Single sample vcf file is extracted from the cohort vcf with GATK SelectVariants (-sn) tool.
+3. Extracted vcf is decomposed and normalized by vt tool.
+4. Decomposed and normalized vcf is compressed (.gz) using bgzip and indexed (.tbi) using tabix.
+5. Generate sample specific .yaml files for Exomiser from input table information. Annotation and priorization for the variants of the vcf with sample specific HPO terms is done with Exomiser 
+6. Generate sample specific .yaml files for LIRICAL from input table information and "Phenotype-driven priorization of candidate diseases and genes..." is done with LIRICAL (: LIkelihood Ratio Interpretation of Clinical AbnormaLities).  
 
 ## Why?
 
@@ -53,9 +52,9 @@ HPO term extraction per samplename is separated as an external R Script. R scrip
 
 Sample input file format is tab separated values (.tsv) text file. First field is samplename in cohort vcf file, separated by tab, samplename in REDCap database and tab separted by HPO terms field with (possibly multiple) HPO terms inside, where each HPO term is quoted with single quotes and everything is enclosed with angle brackets for example: **['HPO:XXXXX', 'HPO:ZZZZZ', 'HPO:YYYYYY']**. 
 
-	| samplename_cohort_vcf | samplename_redcap | hpo_ids |
-	| --------------------- | ----------------- | ------- |
-	| samplename_X1 | samplename_XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] |
+| samplename_cohort_vcf | samplename_redcap | hpo_ids |
+| --- | --- | --- |
+| samplename_X1 | samplename_XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] |
 
 As the samplenames can be different in a vcf file and in redcap(or other equivalen database) there is a column for REDCap specific samplename and cohort-VCF file specific samplename. Cohort-VFC samplename can be full samplename and then the cohort prefix variable can be left empty (""). Cohort-VFC samplename can also be unique part of samplename if samplenames have cohort specific prefix name. In this case you need to fill in cohort prefix variable that so that the cohort_prefix + samplename_cohort_vcf create a valid samplename that is in the vcf file.
 
@@ -96,34 +95,34 @@ After the workflow has completed the following files should be in each date spec
 
 ## TO-DO
 
-[ ] Gather and write-out references to this README.md and add references to the end  
-	[ ] nextflow  
-	[ ] conda  
-	[ ] gatk  
-	[ ] samtools/hst-tools bgzip/tabix  
-	[ ] vt  
-	[ ] exomiser  
-		[ ] HPO  
-	[ ] lirical  
-	[ ] R  
-		[ ] REDCap package  
-	[ ] python  
-		[ ] yaml package / pyyaml  
-		[ ] ast  
-[ ] Add sample specific parametres to **input_fofn** table...  
-	[ ] output directory
-	[ ] cohort-vcf  
+- [ ] Gather and write-out references to this README.md and add references to the end  
+	- [ ] nextflow  
+	- [ ] conda  
+	- [ ] gatk  
+	- [ ] samtools/hst-tools bgzip/tabix  
+	- [ ] vt  
+	- [ ] exomiser  
+		- [ ] HPO  
+	- [ ] lirical  
+	- [ ] R  
+		- [ ] REDCap package  
+	- [ ] python  
+		- [ ] yaml package / pyyaml  
+		- [ ] ast  
+- [ ] Add sample specific parametres to **input_fofn** table...  
+	- [ ] output directory
+	- [ ] cohort-vcf  
 	*enables executing sample variant priorization for samples from different cohort or cohort-vcf versions in with the same input_fofn table file*
-[ ] Document zero-to-finish example of this workflow to a separate file  
-[ ] Finalize extra R script (REDCap HPO-terms extraction)  
-	[ ] Write up documentation  
-[ ] Add VEP annotation?
-[ ] Clean-up, modulize code?  
-[ ] Add checking if sample specific .vcf files are found in the sample output directory  
-	[ ] Add switch to utilize found .vcf file and skip first step (GATK_SELECTVARIANTS) to save time  
-[ ] Inbedding sample specific .bam/.cram file to exomiser output .html with IGV.js  
-[ ] Docker/singularity container for programs ???  
-[ ] simple graphics about the workflow  
+- [ ] Document zero-to-finish example of this workflow to a separate file  
+- [ ] Finalize extra R script (REDCap HPO-terms extraction)  
+	- [ ] Write up documentation  
+- [ ] Add VEP annotation?
+- [ ] Clean-up, modulize code?  
+- [ ] Add checking if sample specific .vcf (.gz and .tbi) files are found in the sample output directory  
+	- [ ] Add switch to utilize found .vcf file and skip first step (GATK_SELECTVARIANTS) to save time  
+- [ ] Inbedding sample specific .bam/.cram file to exomiser output .html with IGV.js  
+- [ ] Docker/singularity container for programs ???  
+- [ ] simple graphics about the workflow  
 
 ## Reference
 
