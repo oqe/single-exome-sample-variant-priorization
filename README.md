@@ -1,6 +1,6 @@
 # Single Exome Sample Variant Priorization
 
-This is a nextflow workflow for extracting (human) single sample from a larger exome sequencing multisample/cohort VCF and annote and prioritize exome variants of that sample.
+This is a nextflow workflow for extracting (human) single sample from a larger exome sequencing multisample/cohort VCF and annote and prioritize exome variants of that sample. "Single sample" as in the context of the workflow stages per sample. You may execute the workflow for multiple samples in parallel.
 
 **Here is a short description of the workflow stages:**  
 1. Generate sample and date specifc output directories
