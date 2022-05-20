@@ -112,17 +112,17 @@ Edit **params.yaml** and for your inputs:
    
 **input_fofn** sample input file's format is tab separated values (.tsv) text file. First field is samplename in cohort vcf file, separated by tab, then samplename in REDCap database and tab separted by HPO terms field with (possibly multiple) HPO terms inside, where each HPO term is quoted with single quotes and everything is enclosed with angle brackets for example: **['HPO:XXXXX', 'HPO:ZZZZZ', 'HPO:YYYYYY']**. 
 
-| samplename_cohort_vcf | samplename_redcap | hpo_ids | cohort_prefix | cohort_vcf | output_dir |
-| --- | --- | --- | --- | --- |
-| X1 | XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] | study ABC | /path/to/cohort-A.vcf | /path/to/study_ABC/results |
+| samplename_cohort_vcf | samplename_redcap | hpo_ids | cohort_prefix | cohort_vcf | output_dir |  
+| --- | --- | --- | --- | --- |  
+| X1 | XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] | study ABC | /path/to/cohort-A.vcf | /path/to/study_ABC/results |  
 
 As the samplenames can be different in a vcf file and in redcap(or other equivalen database) there is a column for REDCap specific samplename and cohort-VCF file specific samplename. Cohort-VFC samplename can be full samplename and then the cohort prefix variable can be left empty (""). Cohort-VFC samplename can also be unique part of samplename if samplenames have cohort specific prefix name. In this case you need to fill in cohort prefix variable that so that the cohort_prefix + samplename_cohort_vcf create a valid samplename that is in the vcf file.
 
 **input_fofn_preexisting_vcfs**
 
-| samplename_cohort_vcf | samplename_redcap | hpo_ids | cohort_prefix | sample_vcf | output_dir |
-| --- | --- | --- | --- | --- |
-| X1 | XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] | studyABC_ | /path/to/studyABC_X1_XRX200.vcf | /path/to/studyABC/results |
+| samplename_cohort_vcf | samplename_redcap | hpo_ids | cohort_prefix | sample_vcf | output_dir |  
+| --- | --- | --- | --- | --- |  
+| X1 | XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] | studyABC_ | /path/to/studyABC_X1_XRX200.vcf | /path/to/studyABC/results |  
 
 
 Exomiser and LIRICAL outputprefix variables (string) are for filename output prefixes. These output prefixes are later added in the whole output file path to yaml files when sample specific yaml files are generated.
