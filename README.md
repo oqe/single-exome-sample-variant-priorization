@@ -2,6 +2,8 @@
 
 This is a nextflow[^nextflow] workflow for extracting (human) single sample from a larger exome sequencing multisample/cohort VCF and annote and prioritize exome variants of that sample. "Single sample" as in the context of the workflow stages per sample. You may execute the workflow for multiple samples in parallel.
 
+## Workflow
+
 **Here is a short description of the workflow stages (main.nf):**  
 1. Generate sample and date specifc output directories
 2. Single sample vcf file is extracted from the cohort vcf with GATK SelectVariants (-sn) tool [^gatk].
@@ -13,135 +15,238 @@ This is a nextflow[^nextflow] workflow for extracting (human) single sample from
 **Alternative workflow for prepared sample vcf(s) workflow stages (genopheno_analysis.nf):**  
 Stages 5. and 6. from previous list. VCFs are expected to be prepared(vt decompose, vt normalized, compressed and indexed).
 
-## Why?
+### Why?
 
 Streamlining individual patient genetic analysis from large cohort of (exome) sequenced patients.
 
 Nextflow for fast deployment with good support for SLURM and cloud service providers[^nextflow]. Conda for easily staying up-to-date, easy management and deployment of available software (versions, for some of the software used)[^conda]. 
 
-Exomiser and LIRICAL for applying phenotype information with genetic information for variant priorization and helping in diagnosis effort with human phenotype ontology terms.
+Exomiser and LIRICAL for applying phenotype information with genetic information for variant priorization and helping in diagnosis effort with human phenotype ontology terms (HPO).
 
-HPO term extraction per samplename is separated as an external R Script[^r]<sup>,</sup>[^r-redcap]. R script is for sample(name) exploration/checking from REDCap database as well as extracting HPO terms and generating sample input table required as input in this workflow. Expectation is that in your use case your institution/or your affiliates is/are hosting REDCap and have HPO terms saved there[^redcap1]<sup>,</sup>[^redcap2]. Alternatively you can input the HPO terms per patient manually into *input_fofn* table.
+### 1. Requirements
 
-## Requirements
-### Software
-+ \*nix based system (or WSL in Windows(10/11))
-	+ Nextflow
-	+ conda (conda enviroment .yaml is provided)
-		- java / Openjdk 11.0
-		- python
-			- pyyaml package
-		- gatk
-		- vt
-			- vt reference genome
-		- bgzip
-		- tabix
-	+ Exomiser 13.0.0 or newer
-		- with Exomiser data download and configured to work
-		- application.properties configured
-	+ LIRICAL 
-		- with LIRICAL data downloaded and configured to work
+<details><summary> Software </summary><blockquote>
 
-### Other files
-+ Reference genome files
-	- .fasta, .fai, .dict
++ \*nix based system (or WSL in Windows(10/11))  
+	+ Nextflow  
+	+ conda (conda enviroment .yaml is provided)  
+		- java / Openjdk 11.0  
+		- python  
+			- pyyaml package  
+		- gatk  
+		- vt  
+			- vt reference genome  
+		- bgzip  
+		- tabix  
+	+ Exomiser 13.0.0 or newer  
+		- with Exomiser data download and configured to work  
+		- application.properties configured  
+	+ LIRICAL   
+		- with LIRICAL data downloaded and configured to work  
+</blockquote></details>
 
-### Input
-+ inputs
-	- cohort/multi-patient vcf (and index)
-	- per patient:
-		- sample identifiers for cohort vcf
-		- relevant hpo-terms
+### 2. Input
 
-## Workflow input
+Main workflow input is defined in **params.yaml**.  
 
-Main workflow input is defined in **params.yaml**.
-Main sample input file table for **main.nf** (path given in params.yaml) is **input_fofn**.
-
-Sample input file table for **genopheno_analysis** (path given in params.yaml) is **input_fofn_preexisting_vcfs**.
+Sample input table file (.tsv) for **main.nf** workflow (path given in params.yaml) is **input_fofn**.  
+Sample input table file (.tsv) for **genopheno_analysis** (path given in params.yaml) is **input_fofn_preexisting_vcfs**.
 
 See more details below.
 
-### params.yaml
+#### 2.1. params.yaml details
 
-Edit **params.yaml** and for your inputs:
-<details><summary>DETAILS</summary>
-<p>
-- input_fofn file path:  
-	- file should be sample input table where (column) values should be tab separated (.tsv), with following variables per sample per line  
-		1. unique id / sample name in cohort VCF file, with or without cohort/sub-cohort designation  
-		2. samplename in REDCap/database where HPO terms were extracted  
-		3. list of HPO terms per sample ['HPO:XXXXX', 'HPO:XXXXX']  
-		4. cohort_prefix  - if your samplename has cohort prefix in the vcf file you can add it here. you may also leave this empty but then the full samplename needs to be input in the first column of input_fofn file  
-		5. cohort_vcf - path to cohort vcf file  
-		6. cohort_vcf_index - path to cohort vcf index file  
-- conda_path  
-	- path to your conda enviroment  
-	- you can import the conda enviroment from /templates/conda_env_variant-tools.yml  
-- vt_path  
-	- path to vt, default provided as per conda env: vt  
-- vt_genome   
-	- vt generated reference genome  
-- bgzip_path  
-	- path to bgzip, default is provided as per conda env: bgzip  
-- tabix_path  
-	- path to bgzip, default is provided as per conda env: tabix  
-- exomiser_path  
-	- path to exomiser jar file  
-- exomiser_config  
-	- path to application.properties file of exomiser  
-- exomiser_yaml_template  
-	- path to exomiser yaml analysis file  
-	- template is provided in /templates/exomiser_13.0.0_hg38_template.yaml, edit this file with your values  
-- exomiser_outputprefix (string output prefix)  
-	- exomiser result file output prefix string  
-- lirical_path  
-	- path to LIRICAL.jar file  
-- lirical_yaml_template  
-	- path to lirical yaml analysis file  
-	- template is provided in /templates/lirical_1.3.4_template.yaml, edit this file with your values and fill in exomiser data directory path in the template  
-- lirical_outputprefix  
-	- lirical result file output prefix string  
-- outdir  
-	- main output directory path  
-- fasta  
-	- reference genome fasta file path  
-	- !Note .fai and .dict files are also required  
-</p>
-</details>  
-   
-**input_fofn** sample input file's format is tab separated values (.tsv) text file. First field is samplename in cohort vcf file, separated by tab, then samplename in REDCap database and tab separted by HPO terms field with (possibly multiple) HPO terms inside, where each HPO term is quoted with single quotes and everything is enclosed with angle brackets for example: **['HPO:XXXXX', 'HPO:ZZZZZ', 'HPO:YYYYYY']**. 
+Edit **params.yaml** for your inputs:
 
-| samplename_cohort_vcf | samplename_redcap | hpo_ids | cohort_prefix | cohort_vcf | output_dir |  
+<details><summary> Sample input table(s) </summary><blockquote>
+<details><summary> input_fofn </summary><blockquote>
+
+Path to sample input table file. This is the main sample specific input file for **main.nf** workflow.
+ 
+Sample input table where value (columns) are tab separated (.tsv), with following variables per sample per line  
+1. required - unique id / sample name in cohort VCF file, with or without cohort/sub-cohort designation  
+2. optional - samplename in REDCap/database where HPO terms were extracted 
+3. required - list of HPO terms per sample ['HPO:XXXXX', 'HPO:XXXXX']  
+4. optional - cohort_prefix  - if your samplename has cohort prefix in the vcf file you can add it here. you may also leave this empty but then the full samplename needs to be input in the first column of input_fofn file  
+5. required - cohort_vcf - path to cohort vcf file  
+6. required - output_dir - base path where sample specific results will be stored (samplename combination and date of workflow execution are added to base path)
+
+**Example input_fofn table** 
+
+| samplename_cohort_vcf | samplename_secondary | hpo_ids | cohort_prefix | cohort_vcf | output_dir |  
 | --- | --- | --- | --- | --- | --- |  
-| X1 | XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] | study ABC | /path/to/cohort-A.vcf | /path/to/study_ABC/results |  
+| X1 | XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] | studyABC_ | /path/to/studyABC/data/studyABC.vcf | /path/to/studyABC/results/individual |  
+| X2 | XR300 | ['HPO:X1000', 'HPO:00120', 'HPO:ZZZZZ'] | studyABC_ | /path/to/studyABC/data/studyABC_v2.vcf | /path/to
+/studyABC/results/individual |  
+| Z001 | 2345 | ['HPO:00042', 'HPO:000124', 'HPO:00139'] |  | /path/to/studyXYZ/data/studyXYZ.vcf | /path/to/studyXYZ/results/ |  
+| Z002 | Z002 | ['HPO:000252', 'HPO:00004'] |  | /path/to/studyXYZ/data/studyXYZ.vcf | /path/to/studyZ/results/individual |  
+| COHORT_Y_Y02 |  | ['HPO:00042', 'HPO:000124', 'HPO:00139'] |  | /path/to/studyXYZ/data/studyXYZ.vcf | /path/to/studyY/results/patient |  
 
-As the samplenames can be different in a vcf file and in redcap(or other equivalen database) there is a column for REDCap specific samplename and cohort-VCF file specific samplename. Cohort-VFC samplename can be full samplename and then the cohort prefix variable can be left empty (""). Cohort-VFC samplename can also be unique part of samplename if samplenames have cohort specific prefix name. In this case you need to fill in cohort prefix variable that so that the cohort_prefix + samplename_cohort_vcf create a valid samplename that is in the vcf file.
+**Samplename combination**:
+- 1st row: In the example input_fofn table 1st sample in the first row, X1 actual samplename in the vcf file is **studyABC_X1**. As the cohort prefix is defined as **studyABC_**. Samplename combination would in this case be **X1_XRX200**.  
+- 4th row: Samplename combination is **Z002**
+- 5th row: Samplename combination is **COHORT_Y_Y02**
+
+**Samplename in vcf**:
+- 1st row: Samplename in vcf is **studyABC_X1**
+- 3rd row: Samplename in vcf is **Z001**
+- 5th row: Samplename in vcf is **COHORT_Y_Y02**
+
+**Sample output directory** (for results on a date 2022-05-24):
+- 1st row: **/path/to/studyABC/results/individual/XRX200_X1/2022-05-24**
+- 3rd row: **path/to/studyABC/results/2345_Z001/2022-05-24**
+- 4th row: **/path/to/studyXYZ/results/individual/Z002/2022-05-24**
+- 5th row: **/path/to/studyY/results/patient/COHORT_Y_Y02/2022-05-24**
+
+As the samplenames can be different in a vcf file and in redcap(or other equivalent database) or sample might have secondary identifier there is a column for secondary (or REDCap specific) samplename and cohort-VCF file specific samplename. Cohort-VFC samplename can be full samplename and then the cohort prefix variable can be left empty (""). Cohort-VFC samplename can also be unique part of samplename if samplenames have cohort specific prefix name. In this case you need to fill in cohort prefix variable so that the cohort_prefix + samplename_cohort_vcf create a valid samplename that is in the vcf file.
+</blockquote></details>
+
+<details><summary> input_fofn_preexisting_vcfs </summary><blockquote>
+
+Path to sample input table file. This is the sample specific input file for **genopheno_analysis.nf** workflow.
 
 **input_fofn_preexisting_vcfs**
 
 | samplename_cohort_vcf | samplename_redcap | hpo_ids | cohort_prefix | sample_vcf | output_dir |  
 | --- | --- | --- | --- | --- | --- |  
-| X1 | XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] | studyABC_ | /path/to/studyABC_X1_XRX200.vcf | /path/to/studyABC/results |  
+| X1 | XRX200 | ['HPO:XXXX', 'HPO:YYYY', 'HPO:ZZZZZ'] | studyABC_ | /path/to/studyABC/results/individual/studyABC_X1_XRX200.vcf | /path/to/studyABC/results/individual |  
 
 
 Exomiser and LIRICAL outputprefix variables (string) are for filename output prefixes. These output prefixes are later added in the whole output file path to yaml files when sample specific yaml files are generated.
-
-+ Reference genome files (Note! be sure to use same version as Exomiser/LIRICAL)
-
-You can download reference files...
+</blockquote></details>
+</blockquote></details>
 
 
-### nextflow.config
+<details><summary> Applications, settings, enviroment and settings related input </summary><blockquote>
+<details><summary> Exomiser related input </summary><blockquote>
+<details><summary> exomiser_path </summary><blockquote>
 
-Edit your **nextflow.config** according to how you plan to execute the workflow, for example local execution, SLURM etc.
+Path to exomiser jar file  
+</blockquote></details>
 
+<details><summary> exomiser_config </summary><blockquote>
 
-## Output
+Path to **application.properties** file of exomiser.  
+</blockquote></details>
 
-In the beginning sample specific output directories are created based on given main output directory parameter, samplename combination (of input_fofn file's samplename_cohort_vcf and samplename_redcap) and date (yyyy-MM-dd). Each stage will save specific files to this sample specific directory.
+<details><summary> exomiser_yaml_template </summary><blockquote>
+
+Path to exomiser yaml analysis file.  
+
+Template is provided in /templates/exomiser_13.0.0_hg38_template.yaml, edit this file with your values.
+</blockquote></details>
+
+<details><summary> exomiser_output_prefix </summary><blockquote>
+
+String output prefix for exomiser result file.
+</blockquote></details>
+</blockquote></details>
+
+<details><summary> LIRICAL related input </summary><blockquote>
+<details><summary> lirical_path </summary><blockquote>
+
+Path to LIRICAL.jar file.
+</blockquote></details>
+
+<details><summary> lirical_yaml_template </summary><blockquote>
+Path to lirical yaml analysis file.  
+  
+Template is provided in /templates/lirical_1.3.4_template.yaml, edit this file with your values and fill in exomiser data directory path in the template.
+</blockquote></details>
+
+<details><summary> lirical_output_prefix </summary><blockquote>
+
+String output prefix for rirical result file.
+</blockquote></details>
+</blockquote></details>
+
+<details><summary> CONDA related input </summary><blockquote>
+<details><summary> conda_path </summary><blockquote>
+Path to your conda enviroment.  
+You can import the conda enviroment from /templates/conda_env_variant-tools.yml  
+</blockquote></details>
+
+<details><summary> vt_path </summary><blockquote>
+
+Path to vt, default provided as per conda env: vt  
+</blockquote></details>
+
+<details><summary> vt_genome </summary><blockquote>
+Path to vt generated reference genome.
+</blockquote></details>
+
+<details><summary> bgzip_path </summary><blockquote>
+
+Path to bgzip, default is provided as per conda env: bgzip 
+</blockquote></details>
+
+<details><summary> tabix_path </summary><blockquote>
+
+Path to bgzip, default is provided as per conda env: tabix  
+</blockquote></details>
+
+<details><summary> gatk_path </summary><blockquote>
+
+Path to gatk, default is provided as per conda env: gatk
+</blockquote></details>
+</blockquote></details>
+
+<details><summary> Reference (genome) input </summary><blockquote>
+<details><summary> fasta </summary><blockquote>
+
+Path to reference genome fasta file.  
+  
+!Note .fai and .dict files are also required, but their paths are generated based on fasta file path.
+</blockquote></details>
+</blockquote></details>
+
+</blockquote></details>
+
+#### 2.2. nextflow.config
+
+Edit your **nextflow.config** according to how and where you plan to execute the workflow. For example fill in SLURM server parameters.
+
+### 3. Execution
+
+Note that **main.nf** requires **input_fofn** to be defined. **input_fofn_preexisting_vcfs** can be left empty.
+
+```bash
+nextflow run main.nf \\
+-params-file params.main.2022-05-24.yaml \\
+-profile local \\
+-c nextflow.config
+```
+
+Note that **genopheno_analysis.nf** requires **input_fofn_preexisting_vcfs** to be defined. **input_fofn** can be left empty.
+
+```bash
+nextflow run genopheno_analysis.nf \\
+-params-file params.genopheno.2022-05-24.yaml \\
+-profile local \\
+-c nextflow.config
+```
+
+Alternatively you can give any variable defined in **params.yaml** as specified parameter with nextflow run...
+
+```bash
+nextflow run main.nf \\
+-params-file params.2022-05-24.yaml \\
+-profile local \\
+-c nextflow.config
+--input_fofn /my/research/project/cohort_abc/data/nf_run_2022-05-24.tsv
+```
+
+This way you might reuse your **params.yaml** file if there are no other changes to variables needed.
+
+## 4. Output
+
+Output file base folder path is given in **input_fofn** or **input_fofn_preexisting_vcfs** table files per each (row) sample in the 6th column. Samplename combination of input_fofn file's 1st column (samplename_in_vcf) and 2nd column (samplename_redcap) is designated as subfolder and (workflow execution) date (yyyy-MM-dd) subfolder are added to base output path.
 
 	<input_main_output_dir> / <samplename_combo > / <date_in_yyyy-MM-dd>
+
+Results (of specified process) outputs are saved to path described above.
+
+### 4.1. main.nf
 
 After the workflow has completed the following files should be in each date specific folder inside sample name folder:  
 - exomiser yaml analysis file  
@@ -150,9 +255,29 @@ After the workflow has completed the following files should be in each date spec
 - exomiser output files (many files)  
 - lirical output file  
 
+### 4.2. genopheno_analysis.nf
+
+- exomiser yaml analysis file  
+- exomiser output files (many files)  
+- lirical yaml analysis file  
+- lirical output file  
+
+## 5. Extras
+
+**_**
+
+**wdl workflow**
+
+**input_fofn_importer.R**  
+
+HPO term extraction per samplename is separated as an external R Script[^r]<sup>,</sup>[^r-redcap]. R script is for sample(name) exploration/checking from REDCap database as well as extracting HPO terms and generating sample input table required as input in this workflow. Expectation is that in your use case your institution/or your affiliates are hosting REDCap server and have HPO terms saved there[^redcap1]<sup>,</sup>[^redcap2]. Inputting the HPO terms per patient, manually into *input_fofn* table is of course possible.
+
 ## TO-DO
 
-- [ ] Update conda enviroment due to Log4 vulnerability
+- [ ] Replace samplename_in_redcap with samplename_secondary (input_fofn, 2nd column)
+	- [ ] Explain that you can leave secondary samplename empty, check and modify the source code for this
+	- [ ] ? add a switch to to params.yaml to select if samplename_in_vcf or samplename_secondary comes first in the samplename_combo
+- [ ] Update conda enviroment due to Log4 vulnerability + check and test openjdk
 - [ ] Document zero-to-finish example of this workflow to a separate file  
 - [ ] Finalize extra R script (REDCap HPO-terms extraction)  
 	- [ ] Write up documentation  
@@ -162,9 +287,9 @@ After the workflow has completed the following files should be in each date spec
 - [ ] Inbedding sample specific .bam/.cram file to exomiser output .html with IGV.js  
 - [ ] Docker/Apptainer formerly known as singularity) container for programs ???  
 - [ ] create simple graphic/graph about the workflow  
-
-- ~~[ ] Add checking if sample specific .vcf (.gz and .tbi) files are found in the sample output directory~~  
-	- ~~[ ] Add switch to utilize found .vcf file and skip first step (GATK_SELECTVARIANTS) to save time~~  
+  
+~~- [ ] Add checking if sample specific .vcf (.gz and .tbi) files are found in the sample output directory~~  
+	~~- [ ] Add switch to utilize found .vcf file and skip first step (GATK_SELECTVARIANTS) to save time~~  
 - [x] Change/add sample specific parametres to **input_fofn** table...  
 	- [x] output directory
 	- [x] cohort-vcf  
@@ -183,7 +308,7 @@ After the workflow has completed the following files should be in each date spec
 	- [x] python  
 		- [x] yaml package / pyyaml
 
-## Tool specific manual/download/homepage links
+## Tool links
 
 * **GATK SelectVariants**: [https://gatk.broadinstitute.org/hc/en-us/articles/4414594350619-SelectVariants](https://gatk.broadinstitute.org/hc/en-us/articles/4414594350619-SelectVariants)  
 * **Vt - normalize, decompose**: [https://genome.sph.umich.edu/wiki/](https://genome.sph.umich.edu/wiki/)  
