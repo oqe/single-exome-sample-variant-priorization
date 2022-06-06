@@ -9,6 +9,10 @@ include { GATK_SELECTVARIANTS; VT_NORMALIZE; VT_DECOMPOSE; VCF_COMPRESS_INDEX; E
 // sample table
 sample_params = file(params.input_fofn)
 
+// switch for samplename combo
+secondary_first = true
+secondary_first = params.secondary_samplename_first
+
 ref_fasta = file(params.fasta)
 ref_fasta_fai = file("${params.fasta}.fai")
 ref_dict = file(params.fasta.replace(".fasta", ".dict"))
@@ -43,7 +47,7 @@ sample_params_ch = channel.fromPath(sample_params)
           cols = line.tokenize('\t')
           [
                 cols[0], // samplename in cohort vcf file
-                cols[1], // samplename in redcap database
+                cols[1], // samplename, secondary (for example from redcap database)
                 cols[2], // hpo ids (list) ["value_1", "value_2", ...]
                 cols[3], // cohort prefix
                 cols[4], // cohort vcf file path
@@ -57,11 +61,18 @@ sample_params_ch_modified = sample_params_ch
     .map { 
       it ->
 
-      // Combine redcap and cohortvcf samplenames separated by "_" if not the same used in output
+      // Combine secondary(for example, redcap) and cohortvcf samplenames separated by "_" if not the same used in output
       if(it[0] == it[1]) { 
         samplename_combo = it[0] 
-      } else { 
-        samplename_combo = it[1] + '_' + it[0] 
+      }
+      else if(it[1]) { 
+        if(secondary_first == 'true'){
+          samplename_combo = it[1] + '_' + it[0] 
+        } else {
+          samplename_combo = it[0] + '_' + it[1] 
+        }
+      } else {
+        samplename_combo = it[0] 
       }
 
       // Add cohort_prefix infront of samplename_in_vcf if cohort_prefix is not empty
@@ -194,8 +205,17 @@ workflow GENO_PHENO_ANALYSIS {
       // edit channel: remove last value (hpo ids)
       sample_info_nohpoids = sample_info 
         .map { 
-          it -> return[ it[0], it[1], it[2], it[2] + ".tbi" ]
+          it -> return[ 
+            it[0], // samplename in vcf
+            it[1], // sample output dir
+            it[2], // sample vcf file (taken by process as path)
+            it[2] + ".tbi", // sample vcf tbi file (taken by process as path)
+            it[2] // sample vcf file (taken by process as val)
+          ]
         }
+
+      //sample_info_nohpoids.view()
+//    }
 
       SYMLINK_PREEXISTING_FILE( sample_info_nohpoids )
     }

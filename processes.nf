@@ -306,9 +306,11 @@ process SYMLINK_PREEXISTING_FILE {
 
   input:
     tuple val(samplename_in_vcf),
-          path(sample_output_dir),
+    // needs to val (NOT path)
+          val(sample_output_dir),
           path(sample_vcf),
-          path(sample_vcf_index)
+          path(sample_vcf_index),
+          val(sample_vcf_fullpath)
 
   output:
     // tuple val(samplename_in_vcf),
@@ -325,8 +327,8 @@ process SYMLINK_PREEXISTING_FILE {
   """
     ln -s "${sample_vcf}" "ln_${sample_vcf}"
     ln -s "${sample_vcf_index}" "ln_${sample_vcf_index}"
-    echo "Symbolic link created \$(date) to pre-existing file: ${sample_vcf}" > "README_${samplename_in_vcf}.txt"
-    echo "Symbolic link created \$(date) to pre-existing file: ${sample_vcf_index}" >> "README_${samplename_in_vcf}.txt"
+    echo "Symbolic link created \$(date) to ln_${sample_vcf} from pre-existing file: ${sample_vcf_fullpath}" > "README_${samplename_in_vcf}.txt"
+    echo "Symbolic link created \$(date) to ln_${sample_vcf}.tbi from pre-existing file: ${sample_vcf_fullpath}.tbi" >> "README_${samplename_in_vcf}.txt"
   """
 
 }
