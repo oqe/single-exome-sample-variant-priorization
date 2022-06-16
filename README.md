@@ -5,15 +5,19 @@ This is a nextflow[^nextflow] workflow for extracting (human) single sample from
 ## Workflow
 
 **Here is a short description of the workflow stages (main.nf):**  
-1. Generate sample and date specifc output directories
-2. Single sample vcf file is extracted from the cohort vcf with GATK SelectVariants (-sn) tool [^gatk].
-3. Extracted vcf is decomposed and normalized by vt tool[^vt].
+0. Generate sample and date specifc output directories
+1. Single sample vcf file is extracted from the cohort vcf with GATK SelectVariants (-sn) tool [^gatk].
+2. Extracted vcf is decomposed   
+3. ..and normalized by vt tool[^vt].
 4. Decomposed and normalized vcf is compressed (.gz) using bgzip and indexed (.tbi) using tabix[^htslib].
 5. Generate sample specific .yaml files[^python]<sup>,</sup>[^pyyaml] for Exomiser from input table information[^exomiser]. Annotation and priorization for the variants of the vcf with sample specific HPO terms is done with Exomiser [^hpo].
 6. Generate sample specific .yaml files for LIRICAL from input table information and "Phenotype-driven priorization of candidate diseases and genes..." is done with LIRICAL (: LIkelihood Ratio Interpretation of Clinical AbnormaLities) [^lirical].  
 
 **Alternative workflow for prepared sample vcf(s) workflow stages (genopheno_analysis.nf):**  
 Stages 5. and 6. from previous list. VCFs are expected to be prepared(vt decompose, vt normalized, compressed and indexed).
+
+![Analysis workflow figure](/extras/images/workflow_figure.svg)
+<p class="text-center"> ~~Figure 1. Analysis Workflow simplified flowchart. Does not include samplename preparation (samplename combination, cohort prefix), nor all process input variables/channel values in the actual (nextflow) workflow. ~~</p>
 
 ### Why?
 
@@ -66,7 +70,9 @@ Edit **params.yaml** for your inputs:
 <details><summary> input_fofn </summary><blockquote>
 
 Path to sample input table file. This is the main sample specific input file for **main.nf** workflow.
- 
+
+Table can have as many samples from any cohort you wish.
+
 Sample input table where value (columns) are tab separated (.tsv), with following variables per sample per line. Columns:
 1. required - unique id / sample name in cohort VCF file, with or without cohort/sub-cohort designation  
 2. optional - secondary samplename (for example in REDCap/database where HPO terms were extracted), can be left empty
