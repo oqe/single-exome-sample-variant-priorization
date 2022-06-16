@@ -16,7 +16,7 @@ This is a nextflow[^nextflow] workflow for extracting (human) single sample from
 **Alternative workflow for prepared sample vcf(s) workflow stages (genopheno_analysis.nf):**  
 Stages 5. and 6. from previous list. VCFs are expected to be prepared(vt decompose, vt normalized, compressed and indexed).
 
-![Analysis workflow figure](/extras/images/workflow_figure.svg)
+![Analysis workflow figure](/extras/images/workflow_figure.png)
 <p class="text-center"> ~~Figure 1. Analysis Workflow simplified flowchart. Does not include samplename preparation (samplename combination, cohort prefix), nor all process input variables/channel values in the actual (nextflow) workflow. ~~</p>
 
 ### Why?
