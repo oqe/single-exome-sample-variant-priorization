@@ -5,6 +5,7 @@ This is a nextflow[^nextflow] workflow for extracting (human) single sample from
 ## Workflow
 
 **Here is a short description of the workflow stages (main.nf):**  
+
 0. Generate sample and date specifc output directories
 1. Single sample vcf file is extracted from the cohort vcf with GATK SelectVariants (-sn) tool [^gatk].
 2. Extracted vcf is decomposed   
@@ -17,7 +18,7 @@ This is a nextflow[^nextflow] workflow for extracting (human) single sample from
 Stages 5. and 6. from previous list. VCFs are expected to be prepared(vt decompose, vt normalized, compressed and indexed).
 
 ![Analysis workflow figure](/extras/images/workflow_figure.png)
-<p class="text-center"> ~~Figure 1. Analysis Workflow simplified flowchart. Does not include samplename preparation (samplename combination, cohort prefix), nor all process input variables/channel values in the actual (nextflow) workflow. ~~</p>
+*<p class="text-center">Figure 1. Analysis Workflow simplified flowchart. Does not include samplename preparation (samplename combination, cohort prefix), nor all process input variables/channel values in the actual (nextflow) workflow.</p>*
 
 ### Why?
 
