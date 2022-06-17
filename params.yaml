@@ -6,7 +6,7 @@
 
 ### Samples to be extracted and preprared to single sample vcfs and analyzed
 #### column 1: samplename in (cohort) vcf file
-#### column 2: samplename in redcap database
+#### column 2: secondary samplename (for example from redcap database)
 #### column 3: hpo ids in format of: ['HPO:YYYYY', 'HPO:YYYYY']
 #### column 4: cohort prefix
 #### column 5: cohort vcf file (full path)
@@ -20,7 +20,7 @@ input_fofn: ""
 
 ### Samples(already extracted and prepared to individual vcfs) to be analyzed
 #### column 1: samplename in sample vcf file
-#### column 2: samplename in redcap database
+#### column 2: secondary samplename (for example from redcap database)
 #### column 3: hpo ids in format of: ['HPO:YYYYY', 'HPO:YYYYY']
 #### column 4: cohort_prefix
 #### column 5: sample vcf file (full path)
@@ -29,6 +29,13 @@ input_fofn: ""
 
 # 'genopheno_analysis.nf' uses this only
 input_fofn_preexisting_vcfs: ""
+
+########################################
+# Whether secondary samplenmae is used first in samplename combination 
+#  (samplename_combo variable) which is used in output subfolder name generation
+#  if secondary samplename is given in input_fofn... table.
+
+secondary_samplename_first: true
 
 ########################################
 

@@ -69,7 +69,7 @@ sample_vcf_ch = sample_params
   }
 
 //
-sample_vcf_ch.view()
+//sample_vcf_ch.view()
 
 //================================================================================
 // LOGGING
