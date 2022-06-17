@@ -2,11 +2,14 @@
 
 This is a nextflow[^nextflow] workflow for extracting (human) single sample from a larger exome sequencing multisample/cohort VCF and annote and prioritize exome variants of that sample. "Single sample" as in the context of the workflow stages per sample. You may execute the workflow for multiple samples in parallel.
 
+![Analysis workflow figure](/extras/images/workflow_figure.png)
+*<p class="text-center">Figure 1. Analysis Workflow simplified flowchart. Does not include samplename preparation (samplename combination, cohort prefix), nor all process input variables/channel values in the actual (nextflow) workflow.</p>*
+
 ## Workflow
 
 **Here is a short description of the workflow stages (main.nf):**  
 
-0. Generate sample and date specifc output directories
+0. Generate samplename combination (depending on alternative samplename and possible cohort prefix) and date specifc output directories
 1. Single sample vcf file is extracted from the cohort vcf with GATK SelectVariants (-sn) tool [^gatk].
 2. Extracted vcf is decomposed   
 3. ..and normalized by vt tool[^vt].
@@ -16,9 +19,6 @@ This is a nextflow[^nextflow] workflow for extracting (human) single sample from
 
 **Alternative workflow for prepared sample vcf(s) workflow stages (genopheno_analysis.nf):**  
 Stages 5. and 6. from previous list. VCFs are expected to be prepared(vt decompose, vt normalized, compressed and indexed).
-
-![Analysis workflow figure](/extras/images/workflow_figure.png)
-*<p class="text-center">Figure 1. Analysis Workflow simplified flowchart. Does not include samplename preparation (samplename combination, cohort prefix), nor all process input variables/channel values in the actual (nextflow) workflow.</p>*
 
 ### Why?
 
@@ -301,7 +301,7 @@ HPO term extraction per samplename is separated as an external R Script[^r]<sup>
 - [ ] Clean-up, modulize code?  
 - [ ] Inbedding sample specific .bam/.cram file to exomiser output .html with IGV.js  
 - [ ] Docker/Apptainer formerly known as singularity) container for programs ???  
-- [ ] create simple graphic/graph about the workflow  
+- [x] create simple graphic/graph about the workflow  
 
 - [x] Replace samplename_in_redcap with samplename_secondary (input_fofn, 2nd column)
 	- [x] Explain that you can leave secondary samplename empty, check and modify the source code for this
