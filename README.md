@@ -18,7 +18,7 @@ This is a nextflow[^nextflow] workflow for extracting (human) single sample from
 6. Generate sample specific .yaml files for LIRICAL from input table information and "Phenotype-driven priorization of candidate diseases and genes..." is done with LIRICAL (: LIkelihood Ratio Interpretation of Clinical AbnormaLities) [^lirical].  
 
 **Alternative workflow for prepared sample vcf(s) workflow stages (genopheno_analysis.nf):**  
-Stages 5. and 6. from previous list. VCFs are expected to be prepared(vt decompose, vt normalized, compressed and indexed).
+Stages 5. and 6. from previous list. Single sample specific VCFs are expected to be prepared(vt decompose, vt normalized, compressed and indexed).
 
 ### Why?
 
@@ -52,6 +52,8 @@ Single sample vcf extraction is done for the purpose of speeding up analysis app
 		- application.properties configured  
 	+ LIRICAL   
 		- with LIRICAL data downloaded and configured to work  
+
+
 </blockquote></details>
 
 ### 2. Input
@@ -292,7 +294,13 @@ After the workflow has completed the following files should be in each date spec
 HPO term extraction per samplename is separated as an external R Script[^r]<sup>,</sup>[^r-redcap]. R script is for sample(name) exploration/checking from REDCap database as well as extracting HPO terms and generating sample input table required as input in this workflow. Expectation is that in your use case your institution/or your affiliates are hosting REDCap server and have HPO terms saved there[^redcap1]<sup>,</sup>[^redcap2]. Inputting the HPO terms per patient, manually into *input_fofn* table is of course possible.
 
 ## TO-DO
-
+- [ ] Update workflow for Exomiser 13.1.0
+	- [ ] Container suppport
+		- [ ] selectable option to perform Exomiser from container in params
+	- [ ] Batch mode support
+		- [ ] process to gather exomiser .yml to single batch file
+		- [ ] process for Exomiser batch analysis mode
+		- [ ] selectable option to perform Exomiser batch mode in params
 - [ ] Document zero-to-finish example of this workflow to a separate file  
 - [ ] Finalize extra R script (REDCap HPO-terms extraction)  
 	- [ ] Write up documentation  
