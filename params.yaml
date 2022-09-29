@@ -41,6 +41,8 @@ secondary_samplename_first: true
 
 # Exomiser 
 
+exomiser_batchmode: true
+
 exomiser_path: "/reference_annotations/exomiser/exomiser-cli-13.0.0/exomiser-cli-13.0.0.jar"
 exomiser_config: "/reference_annotations/exomiser/exomiser-cli-13.0.0/application.properties"
 

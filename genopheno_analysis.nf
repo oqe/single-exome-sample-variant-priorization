@@ -9,6 +9,10 @@ include { GENO_PHENO_ANALYSIS } from './main'
 
 sample_vcf_params = file(params.input_fofn_preexisting_vcfs)
 
+
+enable_exomiser_batchmode = false
+enable_exomiser_batchmode = params.exomiser_batchmode
+
 exomiser_path = file(params.exomiser_path)
 exomiser_config = file(params.exomiser_config)
 exomiser_yaml_template = file(params.exomiser_yaml_template)

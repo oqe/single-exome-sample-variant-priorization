@@ -296,11 +296,12 @@ HPO term extraction per samplename is separated as an external R Script[^r]<sup>
 ## TO-DO
 - [ ] Update workflow for Exomiser 13.1.0
 	- [ ] Container suppport
-		- [ ] selectable option to perform Exomiser from container in params
-	- [ ] Batch mode support
-		- [ ] process to gather exomiser .yml to single batch file
-		- [ ] process for Exomiser batch analysis mode
-		- [ ] selectable option to perform Exomiser batch mode in params
+		~~- [ ] selectable option to perform Exomiser from container in params~~
+		- [ ] Config profile for containers
+	- [x] Batch mode support
+		- [x] process to gather exomiser .yml to single batch file
+		- [x] process for Exomiser batch analysis mode
+		- [x] selectable option to perform Exomiser batch mode in params
 - [ ] Document zero-to-finish example of this workflow to a separate file  
 - [ ] Finalize extra R script (REDCap HPO-terms extraction)  
 	- [ ] Write up documentation  

@@ -233,6 +233,205 @@ process EXOMISER {
 
 }
 
+/*
+process EXOMISER_CONTAINER {
+
+  label exomiser_container
+  conda conda_path
+  publishDir "$sample_output_dir", mode: 'copy', overwrite: true
+
+  input: 
+    tuple val(samplename_in_vcf),
+      val(sample_output_dir),
+      path(input_vcf),
+      val(hpo_ids)
+    
+    path(exomiser_path)
+    path(exomiser_config)
+    val(exomiser_output_prefix)
+    path(exomiser_yaml_template)
+
+  output:
+    path("${samplename_in_vcf}.exomiser.yaml")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.html")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.json")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.genes.tsv")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.variants.tsv")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.vcf")
+
+  script:
+
+  hpo_ids = hpo_ids.trim()
+
+  """
+  set -euo pipefail
+
+  python - <<END
+  import yaml
+  import os
+  import ast
+
+  # Exomiser YAML
+  with open("${exomiser_yaml_template}") as f:
+    list_doc = yaml.safe_load(f)
+
+  hpos = "${hpo_ids}"
+  hpos = ast.literal_eval(hpos)
+
+  list_doc["analysis"]["vcf"] = "${input_vcf}"
+  list_doc["analysis"]["hpoIds"] = hpos
+  list_doc["analysis"]["proband"] = "${samplename_in_vcf}"
+  list_doc["outputOptions"]["outputPrefix"] = "${samplename_in_vcf}.${exomiser_output_prefix}"
+
+  with open("${samplename_in_vcf}.exomiser.yaml", "w") as f:
+    yaml.dump(list_doc, f)
+  END
+
+  exomiser/exomiser-cli:${project.version}  \
+  --analysis "${samplename_in_vcf}.exomiser.yaml" \
+  --spring.config.location=${exomiser_config}
+  """
+
+  stub:
+  """
+    touch "${samplename_in_vcf}.exomiser.yaml"
+    touch "${samplename_in_vcf}.${exomiser_output_prefix}.html"
+    touch "${samplename_in_vcf}.${exomiser_output_prefix}.json"
+    touch "${samplename_in_vcf}.${exomiser_output_prefix}.genes.tsv"
+    touch "${samplename_in_vcf}.${exomiser_output_prefix}.variants.tsv"
+    touch "${samplename_in_vcf}.${exomiser_output_prefix}.vcf"
+  """
+
+}
+*/
+
+process GENERATE_EXOMISER_YAML {
+
+  publishDir "$sample_output_dir", mode: 'copy', overwrite: true
+
+  input: 
+    tuple val(samplename_in_vcf),
+      val(sample_output_dir),
+      path(input_vcf),
+      val(hpo_ids)
+  
+    path(exomiser_yaml_template)
+    val(exomiser_output_prefix)
+
+  output:
+    tuple path("${samplename_in_vcf}.exomiser.yaml"), 
+      path(input_vcf) 
+  
+  script:
+
+    hpo_ids = hpo_ids.trim()
+
+    """
+    set -euo pipefail
+
+    python - <<END
+    import yaml
+    import os
+    import ast
+
+    # Exomiser YAML
+    with open("${exomiser_yaml_template}") as f:
+      list_doc = yaml.safe_load(f)
+
+    hpos = "${hpo_ids}"
+    hpos = ast.literal_eval(hpos)
+
+    list_doc["analysis"]["vcf"] = "${input_vcf}"
+    list_doc["analysis"]["hpoIds"] = hpos
+    list_doc["analysis"]["proband"] = "${samplename_in_vcf}"
+    list_doc["outputOptions"]["outputPrefix"] = "${samplename_in_vcf}.${exomiser_output_prefix}"
+
+    with open("${samplename_in_vcf}.exomiser.yaml", "w") as f:
+      yaml.dump(list_doc, f)
+    END
+    """ 
+
+}
+
+process GENERATE_EXOMISER_BATCH_FILE {
+
+  //publishDir "$sample_output_dir", mode: 'copy', overwrite: true
+  
+  input:
+      tuple path(sample_exomiser_yaml), 
+        path(sample_input_vcf)
+
+  output:
+    path 'exomiser_batch.txt'
+
+    path sample_exomiser_yaml
+    path sample_input_vcf
+
+  script:
+  
+  """
+  echo $sample_exomiser_yaml > exomiser_batch.txt
+  """
+}
+
+process EXOMISER_BATCH_ANALYSIS {
+
+  //label exomiser_container
+  conda conda_path
+  //publishDir "$sample_output_dir", mode: 'copy', overwrite: true
+
+  input:
+    path '*'
+    path '*'
+
+    path batch_file
+    path exomiser_path
+    path exomiser_config
+
+  output:
+    path '*.html'
+    path '*.json'
+    path '*.genes.tsv'
+    path '*.variants.tsv'
+    path '*.vcf'
+  /*
+    path("${samplename_in_vcf}.exomiser.yaml")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.html")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.json")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.genes.tsv")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.variants.tsv")
+    path("${samplename_in_vcf}.${exomiser_output_prefix}.vcf")
+  */
+
+  script:
+  //exomiser/exomiser-cli:${project.version}  \
+  """
+  ${params.java_path} ${params.exomiser_java_opts} \
+  -jar ${exomiser_path} \
+  --analysis-batch ${batch_file} \
+  --spring.config.location=${exomiser_config}
+  """
+
+}
+
+process SAVE_BATCH_RESULTS_TO {
+
+  publishDir "$sample_output_dir", mode: 'copy', overwrite: true
+
+  input:
+    tuple val(samplename),
+      val(sample_output_dir),
+      path(onefile)
+
+  output:
+    path(onefile)
+
+  script:
+  """
+  touch ${onefile}
+  """
+}
+
 
 process LIRICAL {
   
